@@ -13,7 +13,7 @@ Hệ thống quản trị dự án Docker và Sao lưu tự động qua Telegram
 Sử dụng một dòng lệnh duy nhất để cài đặt toàn bộ hệ thống lên VPS mới:
 
 ```bash
-curl -O https://raw.githubusercontent.com/username/repo/main/install_backup_bot.sh && chmod +x install_backup_bot.sh && ./install_backup_bot.sh
+curl -O https://raw.githubusercontent.com/mademlacloi/backup_bot/main/install_backup_bot.sh && chmod +x install_backup_bot.sh && ./install_backup_bot.sh
 ```
 *(Lưu ý: Thay URL trên bằng URL Git thực tế của bạn sau khi push)*
 
