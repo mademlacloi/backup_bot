@@ -1,6 +1,7 @@
 import json
 import sys
 import os
+# --- Hệ thống quản lý cấu hình Multi-Bot ---
 
 CONFIG_PATH = "/opt/bot_manager.json"
 

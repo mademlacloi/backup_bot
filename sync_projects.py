@@ -53,7 +53,7 @@ def scan_projects():
             
             # Tìm WP và DB container
             # Dùng docker ps để lấy tên chính xác của các container đang chạy
-            ps_output = subprocess.getoutput("docker ps --format '{{.Names}}'").splitlines()
+            ps_output = subprocess.getoutput("sudo docker ps --format '{{.Names}}'").splitlines()
             
             for dom in domains_found:
                 # Tìm container liên quan

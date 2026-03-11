@@ -33,7 +33,7 @@ show_menu() {
 
 scan_projects() {
     echo -e "${YELLOW}🔍 Đang quét hệ thống Docker và tệp cấu hình...${NC}"
-    python3 /opt/sync_projects.py
+    sudo python3 /opt/sync_projects.py
     echo -e "${GREEN}✅ Hoàn tất! Danh sách dự án đã được cập nhật.${NC}"
     sleep 2
 }
@@ -50,12 +50,12 @@ config_bots() {
         echo "0. Quay lại"
         read -p "Chọn: " cfg_opt
         case $cfg_opt in
-            1) python3 /opt/manage_bots.py view; read -p "Bấm phím bất kỳ..." ;;
+            1) sudo python3 /opt/manage_bots.py view; read -p "Bấm phím bất kỳ..." ;;
             2)
                 echo -e "${YELLOW}>> Cấu hình Bot TỔNG (Hệ thống sẽ dùng Bot này làm mặc định)${NC}"
                 read -p "Nhập Token Bot Mới: " btoken
                 read -p "Channel ID (ID Nhóm nhận backup): " bcid
-                python3 /opt/manage_bots.py add "main" "$btoken" "$bcid" "Bot quản lý tổng và backup mặc định"
+                sudo python3 /opt/manage_bots.py add "main" "$btoken" "$bcid" "Bot quản lý tổng và backup mặc định"
                 echo -e "${GREEN}✅ Đã cập nhật Bot TỔNG. Hãy chọn 'Restart Bot' để áp dụng.${NC}"
                 sleep 2
                 ;;
@@ -64,7 +64,7 @@ config_bots() {
                 read -p "Token: " btoken
                 read -p "Channel ID: " bcid
                 read -p "Mô tả ngắn: " bdesc
-                python3 /opt/manage_bots.py add "$bname" "$btoken" "$bcid" "$bdesc"
+                sudo python3 /opt/manage_bots.py add "$bname" "$btoken" "$bcid" "$bdesc"
                 sleep 2
                 ;;
             4)
@@ -72,14 +72,14 @@ config_bots() {
                 echo "Các bot đang có:"
                 python3 /opt/manage_bots.py list
                 read -p "Tên Bot muốn gán cho $bdom: " btarget
-                python3 /opt/manage_bots.py map "$bdom" "$btarget"
+                sudo python3 /opt/manage_bots.py map "$bdom" "$btarget"
                 sleep 2
                 ;;
             5)
                 echo "Các bot đang có:"
                 python3 /opt/manage_bots.py list
                 read -p "Nhập tên Bot muốn xóa: " bdel
-                python3 /opt/manage_bots.py remove "$bdel"
+                sudo python3 /opt/manage_bots.py remove "$bdel"
                 sleep 2
                 ;;
             0) break ;;
@@ -177,7 +177,7 @@ run_backup() {
     done
     
     echo -e "\n${YELLOW}>> Đang chạy backup ${BOLD}${selected_type}${NC} cho ${BOLD}${selected_proj}${NC}...${NC}"
-    /opt/advanced_backup.sh "$selected_proj" "$selected_type"
+    sudo /opt/advanced_backup.sh "$selected_proj" "$selected_type"
     read -p "Hoàn tất. Bấm phím bất kỳ để tiếp tục..."
 }
 
