@@ -71,16 +71,18 @@ case $TYPE in
         fi
         echo " -> Dump DB thành công ($(du -sh "$TEMP_DIR/dump.sql" | cut -f1))"
 
-        # Bước 2: Nén toàn bộ thư mục Web
-        echo " -> Đang nén mã nguồn Web..."
-        docker exec "$WP_CONT" tar -czf - /var/www/html > "$TEMP_DIR/html.tar.gz" 2>/dev/null
+        # Bước 2: Sao chép thư mục Web ra host rồi nén (Đáng tin cậy hơn phương pháp pipe)
+        echo " -> Đang sao chép mã nguồn Web..."
+        docker cp "$WP_CONT:/var/www/html" "$TEMP_DIR/html" 2>/dev/null
 
-        if [ ! -s "$TEMP_DIR/html.tar.gz" ]; then
-            echo "Lỗi: Không thể nén /var/www/html. WP_CONT=$WP_CONT"
+        if [ ! -d "$TEMP_DIR/html" ]; then
+            echo "Lỗi: Không thể sao chép /var/www/html từ container $WP_CONT"
             rm -rf "$TEMP_DIR"
             exit 1
         fi
-        echo " -> Nén Web thành công ($(du -sh "$TEMP_DIR/html.tar.gz" | cut -f1))"
+        (cd "$TEMP_DIR" && tar -czf html.tar.gz html)
+        rm -rf "$TEMP_DIR/html"
+        echo " -> Sao chép và nén Web thành công ($(du -sh "$TEMP_DIR/html.tar.gz" | cut -f1))"
 
         # Bước 3: Gộp tất cả vào 1 file tar.gz
         (cd "$TEMP_DIR" && tar -czf "$FINAL_FILE" dump.sql html.tar.gz)
