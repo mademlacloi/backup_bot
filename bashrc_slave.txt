@@ -1,3 +1,0 @@
-# --- HA Admin Identity ---
-export PS1="\[\e[1;32m\][PI-MAIN] \w # \[\e[0m\]"
-echo -e "\n\e[1;32m✅  THÔNG BÁO: ĐÂY LÀ MÁY CHÍNH CHO VỪNG VÀNG & THỜI GIAN RẢNH.\e[0m\n"
