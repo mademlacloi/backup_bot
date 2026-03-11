@@ -19,8 +19,24 @@ echo "--- 📦 Cài đặt công cụ hỗ trợ (jq, python3, pip, cpulimit)...
 apt-get update && apt-get install -y jq python3-pip cpulimit tar 
 pip3 install pyTelegramBotAPI requests --break-system-packages 2>/dev/null || pip3 install pyTelegramBotAPI requests
 
-# 2. Tạo cấu trúc thư mục
+# 2. Tạo cấu trúc thư mục và tải script từ GitHub
+echo "--- 📂 Đang tải bộ script từ GitHub... ---"
 mkdir -p /opt/backups
+GITHUB_RAW="https://raw.githubusercontent.com/mademlacloi/backup_bot/main"
+SCRIPTS=(
+    "advanced_backup.sh"
+    "backup_panel.sh"
+    "ha_bot_v2.py"
+    "manage_bots.py"
+    "alert_bot.py"
+    "sync_projects.py"
+    "uninstall_backup_bot.sh"
+)
+
+for script in "${SCRIPTS[@]}"; do
+    echo "  + Tải: $script"
+    curl -sLo "/opt/$script" "$GITHUB_RAW/$script"
+done
 
 # 3. Thiết lập Alias 'backupbot'
 echo "--- ⌨️ Thiết lập lệnh gõ nhanh (Alias)... ---"
