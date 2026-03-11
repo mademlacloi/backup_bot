@@ -57,7 +57,7 @@ def scan_projects():
             
             for dom in domains_found:
                 # Tìm container liên quan
-                prefix = dom.replace('.com', '').split('.')[0] # vungvang, thoigianranh
+                prefix = dom.replace('.com', '').split('.')[0] # domain1, domain2
                 wp_cont = ""
                 db_cont = ""
                 db_pass = ""

@@ -11,7 +11,7 @@ NC='\033[0m'
 
 # Kiểm tra trạng thái thiết lập Bot
 check_bot_setup() {
-    if [ ! -f "/opt/ha_bot.py" ] || [ ! -f "/etc/systemd/system/ha_bot.service" ]; then
+    if [ ! -f "/opt/ha_bot_v2.py" ] || [ ! -f "/etc/systemd/system/ha_bot.service" ]; then
         return 1
     fi
     return 0
@@ -41,35 +41,44 @@ scan_projects() {
 config_bots() {
     while true; do
         clear
-        echo -e "${BLUE}--- ⚙️ Cấu hình Đa Bot Telegram ---${NC}"
-        echo "1. Xem danh sách Bot & Mapping"
-        echo "2. Thêm/Cập nhật Bot mới"
-        echo "3. Gán Bot cho Website"
-        echo "4. Xóa Bot khỏi cấu hình"
+        echo -e "${BLUE}--- ⚙️ Cấu hình Bot Telegram ---${NC}"
+        echo "1. Xem cấu hình hiện tại (View Config)"
+        echo "2. Cấu hình Bot TỔNG (Main Bot Token)"
+        echo "3. Thêm Bot phụ (Cho các Website riêng)"
+        echo "4. Gán Website cho Bot cụ thể"
+        echo "5. Xóa Bot"
         echo "0. Quay lại"
         read -p "Chọn: " cfg_opt
         case $cfg_opt in
             1) python3 /opt/manage_bots.py view; read -p "Bấm phím bất kỳ..." ;;
-            2) 
-                read -p "Tên gợi nhớ (vd: vungvang_bot): " bname
+            2)
+                echo -e "${YELLOW}>> Cấu hình Bot TỔNG (Hệ thống sẽ dùng Bot này làm mặc định)${NC}"
+                read -p "Nhập Token Bot Mới: " btoken
+                read -p "Channel ID (ID Nhóm nhận backup): " bcid
+                python3 /opt/manage_bots.py add "main" "$btoken" "$bcid" "Bot quản lý tổng và backup mặc định"
+                echo -e "${GREEN}✅ Đã cập nhật Bot TỔNG. Hãy chọn 'Restart Bot' để áp dụng.${NC}"
+                sleep 2
+                ;;
+            3) 
+                read -p "Tên gợi nhớ (vd: bot_phu_1): " bname
                 read -p "Token: " btoken
-                read -p "Channel ID (Để trống nếu dùng ID Admin): " bcid
+                read -p "Channel ID: " bcid
                 read -p "Mô tả ngắn: " bdesc
                 python3 /opt/manage_bots.py add "$bname" "$btoken" "$bcid" "$bdesc"
                 sleep 2
                 ;;
-            3)
-                read -p "Tên miền (vd: vungvang.com): " bdom
+            4)
+                read -p "Tên miền (vd: domain.com): " bdom
                 echo "Các bot đang có:"
                 python3 /opt/manage_bots.py list
-                read -p "Tên Bot muốn gán: " btarget
+                read -p "Tên Bot muốn gán cho $bdom: " btarget
                 python3 /opt/manage_bots.py map "$bdom" "$btarget"
                 sleep 2
                 ;;
-            4)
+            5)
                 echo "Các bot đang có:"
                 python3 /opt/manage_bots.py list
-                read -p "Nhập chính xác tên Bot muốn xóa: " bdel
+                read -p "Nhập tên Bot muốn xóa: " bdel
                 python3 /opt/manage_bots.py remove "$bdel"
                 sleep 2
                 ;;

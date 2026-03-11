@@ -38,11 +38,10 @@ CHANNEL_ID = config["bots"]["main"].get("channel_id")
 
 bot = telebot.TeleBot(TOKEN)
 
-# Ánh xạ tên thân thiện
+# Ánh xạ tên thân thiện (Tùy chỉnh nếu muốn)
 FRIENDLY_NAMES = {
-    "vungvang.com": "🌾 Vừng Vàng",
-    "thoigianranh.com": "☕ Thời Gian Rảnh (Trang chính)",
-    "api.thoigianranh.com": "🔌 ThoiGianRanh API (Subdomain)"
+    "your-domain.com": "🌐 Dự án chính",
+    "api.your-domain.com": "🔌 API Subdomain"
 }
 
 def is_admin(message):
@@ -228,7 +227,8 @@ def handle_backup_file(message):
             new_file.write(downloaded_file)
         
         # Phân tích dự án dựa trên tên file
-        project = "vungvang" if "vungvang" in file_name else "thoigianranh"
+        # Tự động lấy tên dự án từ tên file (dựa trên cấu trúc domain_type.tar.gz)
+        project = file_name.split('_')[0] if '_' in file_name else "default"
         
         markup = types.InlineKeyboardMarkup(row_width=2)
         btn_start = types.InlineKeyboardButton("🚀 Chạy Khôi Phục", callback_data=f"do_restore_{project}_{file_name}")

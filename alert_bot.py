@@ -77,9 +77,7 @@ def send_telegram_file(file_path, caption="", domain=None):
     hp_emo = "✅ Online" if hp_on else "❌ Offline"
     
     projects = {
-        "cloudflared": ("🏰 Hongkong", "hongkong_nginx"),
-        "cloudflared-vungvang": ("🌾 Vừng Vàng", "vungvang_nginx"),
-        "cloudflared-thoigianranh": ("☕ Thời Gian Rảnh", "thoigianranh_nginx")
+        "cloudflared": ("🌐 Cloudflare Tunnel", "cloudflared_nginx"),
     }
     
     # Nhận diện máy chủ hiện tại
