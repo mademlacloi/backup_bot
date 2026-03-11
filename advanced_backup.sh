@@ -59,11 +59,26 @@ case $TYPE in
         nice -n 19 ionice -c 3 cpulimit -l "$LIMIT" -- sh -c "docker exec $WP_CONT tar -czf - /var/www/html/wp-content/uploads > $TEMP_DIR/$FINAL_FILE"
         ;;
     "all")
-        # Backup DB trước
-        nice -n 19 ionice -c 3 docker exec "$DB_CONT" mariadb-dump -u root -p"$DB_PASS" --all-databases > "$TEMP_DIR/dump.sql" 2>/dev/null
+        # Backup DB trước (Thử cả mariadb-dump và mysqldump)
+        docker exec "$DB_CONT" mariadb-dump -u root -p"$DB_PASS" --all-databases > "$TEMP_DIR/dump.sql" 2>/dev/null || \
+        docker exec "$DB_CONT" mysqldump -u root -p"$DB_PASS" --all-databases > "$TEMP_DIR/dump.sql" 2>/dev/null
+        
+        if [ ! -s "$TEMP_DIR/dump.sql" ]; then
+            echo "Lỗi: Không thể xuất dữ liệu database (quyền hạn hoặc sai lệnh dump)."
+            rm -rf "$TEMP_DIR"
+            exit 1
+        fi
+
         # Nén toàn bộ mã nguồn + file dump DB
-        nice -n 19 ionice -c 3 cpulimit -l "$LIMIT" -- sh -c "docker exec $WP_CONT tar -czf - /var/www/html > $TEMP_DIR/html.tar.gz"
-        (cd "$TEMP_DIR" && nice -n 19 ionice -c 3 cpulimit -l "$LIMIT" -- tar -czf "$FINAL_FILE" dump.sql html.tar.gz)
+        nice -n 19 ionice -c 3 cpulimit -l "$LIMIT" -- sh -c "docker exec $WP_CONT tar -czf - /var/www/html > $TEMP_DIR/html.tar.gz" 2>/dev/null
+        
+        if [ ! -f "$TEMP_DIR/html.tar.gz" ]; then
+            echo "Lỗi: Không thể nén thư mục /var/www/html."
+            rm -rf "$TEMP_DIR"
+            exit 1
+        fi
+
+        (cd "$TEMP_DIR" && tar -czf "$FINAL_FILE" dump.sql html.tar.gz)
         rm "$TEMP_DIR/dump.sql" "$TEMP_DIR/html.tar.gz"
         ;;
     *)
