@@ -87,9 +87,11 @@ def scan_projects():
                     "db_pass": db_pass
                 }
                 
-                # Đặc biệt cho thoigianranh.com có 2 site
-                if dom == "thoigianranh.com": projects[dom]["db_name"] = env.get('MYSQL_DATABASE_MAIN', '')
-                if dom == "api.thoigianranh.com": projects[dom]["db_name"] = env.get('MYSQL_DATABASE_API', '')
+                # Ghi nhận db_name từ .env nếu có, nếu không để trống
+                projects[dom]["db_name"] = env.get('MYSQL_DATABASE', env.get('DB_NAME', ''))
+
+                # Gợi ý: Nếu một domain có nhiều database hoặc cấu hình đặc thù, 
+                # hãy chỉnh sửa trực tiếp trong file /opt/projects.json trên VPS.
                     
     with open(PROJECTS_JSON, 'w', encoding='utf-8') as f:
         json.dump(projects, f, indent=4, ensure_ascii=False)

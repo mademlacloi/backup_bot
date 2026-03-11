@@ -41,10 +41,9 @@ CHANNEL_ID = config["bots"]["main"].get("channel_id")
 
 bot = telebot.TeleBot(TOKEN)
 
-# Ánh xạ tên thân thiện (Tùy chỉnh nếu muốn)
+# Ánh xạ tên thân thiện (Tùy chỉnh trong projects.json hoặc tại đây)
 FRIENDLY_NAMES = {
-    "your-domain.com": "🌐 Dự án chính",
-    "api.your-domain.com": "🔌 API Subdomain"
+    "example.com": "🌐 Dự án mẫu",
 }
 
 def is_admin(message):
