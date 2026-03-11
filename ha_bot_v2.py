@@ -8,17 +8,27 @@ import sys
 CONFIG_PATH = "/opt/bot_manager.json"
 
 def load_config():
+    if not os.path.exists(CONFIG_PATH):
+        # Trả về cấu hình mặc định nếu file chưa tồn tại
+        return {
+            "admin_ids": [123456789],
+            "bots": {
+                "main": {
+                    "token": "YOUR_BOT_TOKEN_HERE",
+                    "channel_id": -100123456789,
+                    "description": "Bot quản lý tổng và backup mặc định"
+                }
+            },
+            "mappings": {
+                "default": "main"
+            }
+        }
     try:
         with open(CONFIG_PATH, 'r') as f:
             return json.load(f)
     except Exception as e:
         print(f"Error loading config: {e}")
         return None
-
-config = load_config()
-if not config:
-    print("CRITICAL: Could not load /opt/bot_manager.json")
-    sys.exit(1)
 
 TOKEN = config["bots"]["main"]["token"]
 ADMIN_IDS = config["admin_ids"]
