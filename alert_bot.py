@@ -48,7 +48,7 @@ def send_telegram_file(file_path, caption="", domain=None):
         dest_id = channel_id if channel_id else admin_id
         with open(file_path, 'rb') as f:
             files = {'document': f}
-            payload = {'chat_id': dest_id, 'caption': caption, 'parse_mode': 'Markdown'}
+            payload = {'chat_id': dest_id, 'caption': caption}
             r = requests.post(url, data=payload, files=files, timeout=60)
             r.raise_for_status()
             
