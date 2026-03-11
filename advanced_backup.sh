@@ -58,6 +58,14 @@ case $TYPE in
     "media")
         nice -n 19 ionice -c 3 cpulimit -l "$LIMIT" -- sh -c "docker exec $WP_CONT tar -czf - /var/www/html/wp-content/uploads > $TEMP_DIR/$FINAL_FILE"
         ;;
+    "all")
+        # Backup DB trước
+        nice -n 19 ionice -c 3 docker exec "$DB_CONT" mariadb-dump -u root -p"$DB_PASS" --all-databases > "$TEMP_DIR/dump.sql" 2>/dev/null
+        # Nén toàn bộ mã nguồn + file dump DB
+        nice -n 19 ionice -c 3 cpulimit -l "$LIMIT" -- sh -c "docker exec $WP_CONT tar -czf - /var/www/html > $TEMP_DIR/html.tar.gz"
+        (cd "$TEMP_DIR" && nice -n 19 ionice -c 3 cpulimit -l "$LIMIT" -- tar -czf "$FINAL_FILE" dump.sql html.tar.gz)
+        rm "$TEMP_DIR/dump.sql" "$TEMP_DIR/html.tar.gz"
+        ;;
     *)
         echo "Lỗi: Loại backup không hợp lệ ($TYPE)"
         exit 1

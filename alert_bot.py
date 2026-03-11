@@ -60,6 +60,8 @@ def send_telegram_file(file_path, caption="", domain=None):
     except Exception as e:
         print(f"Error sending file to telegram: {e}")
         sys.exit(1)
+
+def get_status_report():
     HP_IP = "your-vps-ip-or-ddns.com"
     HP_PORT = 22
     
@@ -116,37 +118,6 @@ def send_telegram_file(file_path, caption="", domain=None):
     
     return msg
 
-def send_telegram(message):
-    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-    payload = {
-        "chat_id": ADMIN_ID,
-        "text": message,
-        "parse_mode": "Markdown"
-    }
-    try:
-        requests.post(url, json=payload, timeout=10)
-    except Exception as e:
-        print(f"Error sending telegram: {e}")
-
-def send_telegram_file(file_path, caption=""):
-    url = f"https://api.telegram.org/bot{TOKEN}/sendDocument"
-    try:
-        dest_id = CHANNEL_ID if CHANNEL_ID else ADMIN_ID
-        with open(file_path, 'rb') as f:
-            files = {'document': f}
-            payload = {'chat_id': dest_id, 'caption': caption, 'parse_mode': 'Markdown'}
-            r = requests.post(url, data=payload, files=files, timeout=60)
-            r.raise_for_status() # Kiểm tra lỗi HTTP (4xx, 5xx)
-            
-            # Kiểm tra lỗi từ Telegram API (ngay cả khi HTTP 200)
-            result = r.json()
-            if not result.get("ok"):
-                print(f"Telegram API Error: {result.get('description')}")
-                sys.exit(1)
-            
-    except Exception as e:
-        print(f"Error sending file to telegram: {e}")
-        sys.exit(1)
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
