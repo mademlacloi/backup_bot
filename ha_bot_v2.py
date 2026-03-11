@@ -30,6 +30,8 @@ def load_config():
         print(f"Error loading config: {e}")
         return None
 
+config = load_config()
+
 TOKEN = config["bots"]["main"]["token"]
 ADMIN_IDS = config["admin_ids"]
 CHANNEL_ID = config["bots"]["main"].get("channel_id")
