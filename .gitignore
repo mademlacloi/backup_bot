@@ -1,0 +1,10 @@
+# Không đẩy các tệp chứa Token và Mật khẩu lên GitHub
+bot_manager.json
+projects.json
+
+# Không đẩy các tệp tạm và tệp cũ
+*.tar
+*.sql
+venv/
+__pycache__/
+.DS_Store

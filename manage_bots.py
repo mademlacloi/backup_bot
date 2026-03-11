@@ -8,11 +8,11 @@ def load_config():
     if not os.path.exists(CONFIG_PATH):
         # Trả về cấu hình mặc định nếu file chưa tồn tại
         return {
-            "admin_ids": [1257141148],
+            "admin_ids": [123456789],
             "bots": {
                 "main": {
-                    "token": "8726045761:AAF2LpKjga6Oyw8mervBEa0_dBCtUCo6_xA",
-                    "channel_id": -1003793061700,
+                    "token": "YOUR_BOT_TOKEN_HERE",
+                    "channel_id": -100123456789,
                     "description": "Bot quản lý tổng và backup mặc định"
                 }
             },

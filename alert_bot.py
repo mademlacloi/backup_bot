@@ -60,8 +60,8 @@ def send_telegram_file(file_path, caption="", domain=None):
     except Exception as e:
         print(f"Error sending file to telegram: {e}")
         sys.exit(1)
-    HP_IP = "hongkongwedding.duckdns.org"
-    HP_PORT = 2332
+    HP_IP = "your-vps-ip-or-ddns.com"
+    HP_PORT = 22
     
     # Check HP (Cloud)
     hp_on = False
