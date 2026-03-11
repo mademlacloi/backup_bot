@@ -102,11 +102,11 @@ if [ -f "$HTML_TAR" ]; then
     mkdir -p "$STAGE_DIR"
     tar -xzf "$HTML_TAR" -C "$STAGE_DIR"
     docker cp "$STAGE_DIR/html/." "$WP_CONT:/var/www/html/"
-    rm -rf "$STAGE_DIR"
+    sudo rm -rf "$STAGE_DIR"
     echo " -> Đã khôi phục mã nguồn vào container $WP_CONT"
 else
     echo " -> Không tìm thấy html.tar.gz, bỏ qua."
 fi
 
-rm -rf "$EXTRACT_DIR"
+sudo rm -rf "$EXTRACT_DIR"
 echo "--- Khôi phục $PROJECT Hoàn Tất! ---"

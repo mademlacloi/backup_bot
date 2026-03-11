@@ -1,10 +1,20 @@
-# Không đẩy các tệp chứa Token và Mật khẩu lên GitHub
+# Cấu hình Gitignore cho Backup Bot
+# Tránh đẩy thông tin nhạy cảm và file tạm lên GitHub
+
+# File cấu hình chứa Token và Mật khẩu (QUAN TRỌNG)
 bot_manager.json
 projects.json
 
-# Không đẩy các tệp tạm và tệp cũ
-*.tar
-*.sql
-venv/
+# Thư mục chứa các bản backup tạm và buffer khôi phục
+/backups/
+/restore_buffer/
+*.tar.gz
+*.part_*
+
+# Python caches
 __pycache__/
+*.pyc
+
+# OS files
 .DS_Store
+Thumbs.db

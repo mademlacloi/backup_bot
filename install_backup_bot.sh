@@ -16,12 +16,12 @@ echo -e "${GREEN}>>> Bắt đầu cài đặt Hệ thống Backup Bot...${NC}"
 
 # 1. Cài đặt các gói phụ thuộc
 echo "--- 📦 Cài đặt công cụ hỗ trợ (jq, python3, pip, cpulimit)... ---"
-apt-get update && apt-get install -y jq python3-pip cpulimit tar 
-pip3 install pyTelegramBotAPI requests --break-system-packages 2>/dev/null || pip3 install pyTelegramBotAPI requests
+apt-get update && sudo apt-get install -y jq python3-pip cpulimit tar 
+sudo pip3 install pyTelegramBotAPI requests --break-system-packages 2>/dev/null || sudo pip3 install pyTelegramBotAPI requests
 
 # 2. Tạo cấu trúc thư mục và tải script từ GitHub
 echo "--- 📂 Đang tải bộ script từ GitHub... ---"
-mkdir -p /opt/backups
+sudo mkdir -p /opt/backups
 GITHUB_RAW="https://raw.githubusercontent.com/mademlacloi/backup_bot/main"
 SCRIPTS=(
     "advanced_backup.sh"
@@ -40,16 +40,16 @@ done
 
 # 3. Thiết lập Alias 'backupbot'
 echo "--- ⌨️ Thiết lập lệnh gõ nhanh (Alias)... ---"
-sed -i '/alias backuppanel/d' ~/.bashrc
-sed -i '/alias bakupbot/d' ~/.bashrc
-sed -i '/alias backupbot/d' ~/.bashrc
+sudo sed -i '/alias backuppanel/d' ~/.bashrc
+sudo sed -i '/alias bakupbot/d' ~/.bashrc
+sudo sed -i '/alias backupbot/d' ~/.bashrc
 echo "alias backupbot='/opt/backup_panel.sh'" >> ~/.bashrc
 source ~/.bashrc
 
 # 4. Cấp quyền thực thi cho các script
 echo "--- 🔑 Cấp quyền thực thi script... ---"
-chmod +x /opt/*.sh
-chmod +x /opt/*.py
+sudo chmod +x /opt/*.sh
+sudo chmod +x /opt/*.py
 
 # 5. Thiết lập Systemd Service cho Bot Telegram
 echo "--- 🤖 Thiết lập Service cho Bot Telegram... ---"

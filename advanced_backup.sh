@@ -47,7 +47,7 @@ case $TYPE in
     "db")
         nice -n 19 ionice -c 3 docker exec "$DB_CONT" mariadb-dump -u root -p"$DB_PASS" --all-databases > "$TEMP_DIR/dump.sql" 2>/dev/null
         (cd "$TEMP_DIR" && nice -n 19 ionice -c 3 cpulimit -l "$LIMIT" -- tar -czf "$FINAL_FILE" dump.sql)
-        rm "$TEMP_DIR/dump.sql"
+        sudo rm "$TEMP_DIR/dump.sql"
         ;;
     "theme")
         nice -n 19 ionice -c 3 cpulimit -l "$LIMIT" -- sh -c "docker exec $WP_CONT tar -czf - /var/www/html/wp-content/themes > $TEMP_DIR/$FINAL_FILE"
@@ -66,7 +66,7 @@ case $TYPE in
 
         if [ ! -s "$TEMP_DIR/dump.sql" ]; then
             echo "Lỗi: Database dump thất bại. DB_CONT=$DB_CONT DB_NAME=$DB_NAME"
-            rm -rf "$TEMP_DIR"
+            sudo rm -rf "$TEMP_DIR"
             exit 1
         fi
         echo " -> Dump DB thành công ($(du -sh "$TEMP_DIR/dump.sql" | cut -f1))"
@@ -77,16 +77,16 @@ case $TYPE in
 
         if [ ! -d "$TEMP_DIR/html" ]; then
             echo "Lỗi: Không thể sao chép /var/www/html từ container $WP_CONT"
-            rm -rf "$TEMP_DIR"
+            sudo rm -rf "$TEMP_DIR"
             exit 1
         fi
         (cd "$TEMP_DIR" && tar -czf html.tar.gz html)
-        rm -rf "$TEMP_DIR/html"
+        sudo rm -rf "$TEMP_DIR/html"
         echo " -> Sao chép và nén Web thành công ($(du -sh "$TEMP_DIR/html.tar.gz" | cut -f1))"
 
         # Bước 3: Gộp tất cả vào 1 file tar.gz
         (cd "$TEMP_DIR" && tar -czf "$FINAL_FILE" dump.sql html.tar.gz)
-        rm "$TEMP_DIR/dump.sql" "$TEMP_DIR/html.tar.gz"
+        sudo rm "$TEMP_DIR/dump.sql" "$TEMP_DIR/html.tar.gz"
         ;;
     *)
         echo "Lỗi: Loại backup không hợp lệ ($TYPE)"
@@ -103,7 +103,7 @@ UPLOAD_ERRORS=0
 if [ "$FILE_SIZE" -gt "$MAX_SIZE" ]; then
     echo "File lớn ($((FILE_SIZE/1024/1024))MB), chia nhỏ..."
     split -b "$SPLIT_SIZE" "$FINAL_FILE" "${FINAL_FILE}.part_"
-    rm "$FINAL_FILE"
+    sudo rm "$FINAL_FILE"
     for part in ${FINAL_FILE}.part_*; do
         python3 "$ALERT_BOT" SEND_FILE "$TEMP_DIR/$part" "[$DOMAIN] $TYPE - Part: $part" "$DOMAIN"
         [ $? -ne 0 ] && UPLOAD_ERRORS=$((UPLOAD_ERRORS + 1))
@@ -114,7 +114,7 @@ else
 fi
 
 if [ $UPLOAD_ERRORS -eq 0 ]; then
-    rm -rf "$TEMP_DIR"
+    sudo rm -rf "$TEMP_DIR"
     echo "--- Hoàn tất thành công ---"
 else
     echo "--- LỖI: Upload thất bại, giữ lại file tại $TEMP_DIR ---"

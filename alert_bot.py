@@ -62,7 +62,7 @@ def send_telegram_file(file_path, caption="", domain=None):
         sys.exit(1)
 
 def get_status_report():
-    HP_IP = "your-vps-ip-or-ddns.com"
+    HP_IP = "1.2.3.4"
     HP_PORT = 22
     
     # Check HP (Cloud)

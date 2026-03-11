@@ -1,30 +1,40 @@
-# 🤖 VPS Backup Bot System
+# 🚀 VPS Backup Bot System
 
-Hệ thống quản trị dự án Docker và Sao lưu tự động qua Telegram dành cho VPS (đặc biệt tối ưu cho ARM/Pi).
+Hệ thống quản lý VPS và sao lưu dữ liệu tự động qua Telegram, được tối ưu hóa cho các dự án chạy trên Docker.
 
-## ✨ Tính năng nổi bật
-- **Auto-Discovery**: Tự động nhận diện Website/Subdomain mới từ Docker-compose.
-- **Multi-Bot**: Gán nhiều Bot Telegram khác nhau cho từng tên miền khác nhau.
-- **Smart Backup**: Tách riêng DB, Theme, Plugin, Media; Chia nhỏ file tự động (bypass limit Telegram 2GB).
-- **CPU Control**: Tự động giới hạn CPU khi nén file để không làm treo VPS (Nice/Cpulimit).
-- **Terminal UI**: Bảng điều khiển trực quan bằng lệnh `backupbot`.
+## ✨ Tính năng chính
 
-## 🚀 Cài đặt nhanh (1 chạm)
-Sử dụng một dòng lệnh duy nhất để cài đặt toàn bộ hệ thống lên VPS mới:
+- **Quản lý tập trung**: Một Bot có thể quản lý nhiều website, hoặc mỗi website một Bot riêng (Multi-Bot).
+- **Tự động quét dự án**: Heuristic tự động nhận diện Container WordPress, MariaDB và mã nguồn từ Docker Compose.
+- **Backup tách lớp**: Hỗ trợ sao lưu riêng biệt Database, Themes, Plugins, Uploads hoặc Full Backup.
+- **Gửi file lên Telegram**: Tự động chia nhỏ file lớn (>18MB) để vượt qua giới hạn của Telegram.
+- **Khôi phục dễ dàng**: Forward file backup vào Bot để thực hiện Restore tự động.
+- **Tối ưu hiệu năng**: Tự động giới hạn CPU khi nén file để không ảnh hưởng đến Website đang hoạt động.
+
+## 🛠 Yêu cầu hệ thống
+
+- HĐH: Linux (Ubuntu/Debian).
+- Công cụ: `jq`, `python3`, `pip3`, `cpulimit`, `tar`, `curl`.
+- Docker & Docker Compose (cho các website cần backup).
+
+## 🚀 Cài đặt nhanh
+
+Để cài đặt tự động từ GitHub, hãy chạy lệnh sau:
 
 ```bash
-curl -O https://raw.githubusercontent.com/mademlacloi/backup_bot/main/install_backup_bot.sh && chmod +x install_backup_bot.sh && ./install_backup_bot.sh
-source ~/.bashrc
+curl -sL https://raw.githubusercontent.com/mademlacloi/backup_bot/main/install_backup_bot.sh | bash
 ```
 
-## ⌨️ Các lệnh điều khiển
-- `backupbot`: Mở bảng điều khiển giao diện Terminal.
-- `/backup` (trên Telegram): Chạy sao lưu từ xa.
-- `/status` (trên Telegram): Kiểm tra tình trạng các dự án.
-- `/scan` (trên Telegram): Cập nhật danh sách website mới cài.
+Sau khi cài đặt, hãy cấu hình Token tại `/opt/bot_manager.json` và gõ lệnh `backupbot` để bắt đầu.
 
-## 🗑️ Gỡ cài đặt
-Nếu không muốn sử dụng nữa, hãy chạy:
-```bash
-bash /opt/uninstall_backup_bot.sh
-```
+## 📖 Hướng dẫn chi tiết
+
+Vui lòng xem file [huong_dan_cai_dat.md](huong_dan_cai_dat.md) để biết cách cài đặt thủ công và các cấu hình nâng cao.
+
+## 🛡 Bảo mật
+
+- Không bao giờ chia sẻ file `bot_manager.json` hoặc `projects.json` công khai vì chúng chứa Token và mật khẩu Database của bạn.
+- Hệ thống đi kèm file `.gitignore` để tránh đẩy nhầm các thông tin nhạy cảm này lên GitHub.
+
+---
+Phát triển bởi [mademlacloi](https://github.com/mademlacloi)

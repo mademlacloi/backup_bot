@@ -17,7 +17,7 @@ def load_config():
             "admin_ids": [123456789],
             "bots": {
                 "main": {
-                    "token": "YOUR_BOT_TOKEN_HERE",
+                    "token": "123456789:ABCDefghIJKLmnopQRSTuvwxYZ",
                     "channel_id": -100123456789,
                     "description": "Bot quản lý tổng và backup mặc định"
                 }
@@ -40,6 +40,14 @@ ADMIN_IDS = config["admin_ids"]
 CHANNEL_ID = config["bots"]["main"].get("channel_id")
 
 bot = telebot.TeleBot(TOKEN)
+
+# Kiểm tra Token khi khởi động
+try:
+    bot_info = bot.get_me()
+    print(f"✅ Bot kết nối thành công: @{bot_info.username}")
+except Exception as e:
+    print(f"❌ Lỗi kết nối Bot (Có thể sai Token): {e}")
+    sys.exit(1)
 
 # Ánh xạ tên thân thiện (Tùy chỉnh trong projects.json hoặc tại đây)
 FRIENDLY_NAMES = {
@@ -122,7 +130,7 @@ def manual_cleanup(message):
     if not is_admin(message): return
     bot.reply_to(message, "⏳ Đang quét và dọn dẹp các bản backup cũ (> 60 ngày)...")
     
-    cmd = "find /opt/backups -type d -mtime +60 -exec rm -rf {} + 2>&1"
+    cmd = "sudo find /opt/backups -type d -mtime +60 -exec rm -rf {} + 2>&1"
     res = subprocess.getoutput(cmd)
     
     if not res:
@@ -268,7 +276,7 @@ def handle_restore_execute(call):
     res = subprocess.getoutput(cmd)
     
     # Dọn dẹp folder đệm sau khi xong
-    subprocess.run("rm -rf /opt/restore_buffer/*", shell=True)
+    subprocess.run("sudo rm -rf /opt/restore_buffer/*", shell=True)
     
     bot.send_message(call.message.chat.id, f"🏁 **Kết quả khôi phục {project}:**\n\n```\n{res}\n```", parse_mode='Markdown')
 

@@ -30,16 +30,16 @@ echo -e "\n${CYAN}>>> Bắt đầu gỡ bỏ...${NC}"
 
 # 1. Dừng và gỡ bỏ Service
 echo -e "[-] Đang dừng Service Bot..."
-systemctl stop ha_bot 2>/dev/null
-systemctl disable ha_bot 2>/dev/null
-rm -f /etc/systemd/system/ha_bot.service
-systemctl daemon-reload
+sudo systemctl stop ha_bot 2>/dev/null
+sudo systemctl disable ha_bot 2>/dev/null
+sudo rm -f /etc/systemd/system/ha_bot.service
+sudo systemctl daemon-reload
 
 # 2. Xóa Alias
 echo -e "[-] Đang xóa Alias trong .bashrc..."
-sed -i '/alias backupbot/d' ~/.bashrc
-sed -i '/alias bakupbot/d' ~/.bashrc
-sed -i '/alias backuppanel/d' ~/.bashrc
+sudo sed -i '/alias backupbot/d' ~/.bashrc
+sudo sed -i '/alias bakupbot/d' ~/.bashrc
+sudo sed -i '/alias backuppanel/d' ~/.bashrc
 
 # 3. Xóa các file script trong /opt
 echo -e "[-] Đang xóa các tệp tin trong /opt/..."
@@ -56,14 +56,14 @@ FILES=(
     "install.sh"
 )
 for file in "${FILES[@]}"; do
-    [ -f "/opt/$file" ] && rm -f "/opt/$file" && echo "    + Đã xóa: $file"
+    [ -f "/opt/$file" ] && sudo rm -f "/opt/$file" && echo "    + Đã xóa: $file"
 done
 
 # 4. Gỡ bỏ các gói phụ thuộc
 echo -e "[-] Đang gỡ bỏ các gói phụ thuộc hệ thống..."
-pip3 uninstall -y pyTelegramBotAPI requests 2>/dev/null
-apt-get remove -y jq cpulimit 2>/dev/null
-apt-get autoremove -y 2>/dev/null
+sudo pip3 uninstall -y pyTelegramBotAPI requests 2>/dev/null
+sudo apt-get remove -y jq cpulimit 2>/dev/null
+sudo apt-get autoremove -y 2>/dev/null
 
 echo -e "\n${GREEN}=================================================="
 echo -e " ✅ ĐÃ GỠ BỎ TOÀN BỘ HỆ THỐNG THÀNH CÔNG!"
@@ -72,4 +72,4 @@ echo -e " 👉 Hãy gõ lệnh: ${YELLOW}source ~/.bashrc${GREEN} để cập nh
 echo -e "==================================================${NC}"
 
 # Tự xóa tệp uninstall nếu đang chạy từ /opt
-[ -f "/opt/uninstall_backup_bot.sh" ] && rm -f "/opt/uninstall_backup_bot.sh"
+[ -f "/opt/uninstall_backup_bot.sh" ] && sudo rm -f "/opt/uninstall_backup_bot.sh"
