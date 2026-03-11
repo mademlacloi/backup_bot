@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # ─────────────────────────────────────────
+  # NGINX REVERSE PROXY
+  # ─────────────────────────────────────────
+  nginx:
+    image: nginx:latest
+    container_name: vungvang_nginx
+    restart: always
+    ports:
+      - '82:80'
+    volumes:
+      - /opt/vungvang-server/nginx/conf:/etc/nginx/conf.d
+    networks:
+      - vungvang_network
+    depends_on:
+      - wordpress
+
+  # ─────────────────────────────────────────
+  # WORDPRESS
+  # ─────────────────────────────────────────
+  wordpress:
+    image: wordpress:latest
+    container_name: vungvang_wordpress
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: mariadb
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+      # Fix lỗi Redirect Loop HTTPS
+      WORDPRESS_CONFIG_EXTRA: |
+        define('FORCE_SSL_ADMIN', true);
+    volumes:
+      - vungvang_wp_data:/var/www/html
+    networks:
+      - vungvang_network
+    depends_on:
+      - mariadb
+
+  # ─────────────────────────────────────────
+  # MARIADB
+  # ─────────────────────────────────────────
+  mariadb:
+    image: mariadb:11
+    container_name: vungvang_mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - vungvang_db_data:/var/lib/mysql
+    networks:
+      - vungvang_network
+
+  # ─────────────────────────────────────────
+  # PORT CHECKER API
+  # ─────────────────────────────────────────
+  port-checker:
+    image: python:3.11-alpine
+    container_name: vungvang_port_checker
+    restart: always
+    volumes:
+      - ./port-checker/main.py:/main.py
+    command: sh -c "pip install --no-cache-dir fastapi uvicorn python-multipart && uvicorn main:app --host 0.0.0.0 --port 8000"
+    ports:
+      - '8002:8000'
+    networks:
+      - vungvang_network
+
+volumes:
+  vungvang_wp_data:
+  vungvang_db_data:
+
+
+networks:
+  vungvang_network:
+    external: true

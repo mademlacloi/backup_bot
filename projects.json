@@ -1,0 +1,20 @@
+{
+    "vungvang.com": {
+        "wp_container": "vungvang_wordpress",
+        "db_container": "vungvang_mariadb",
+        "db_name": "vungvang_mariadb",
+        "db_pass": "vungvang_root_2026_pass"
+    },
+    "thoigianranh.com": {
+        "wp_container": "thoigianranh_wp_main",
+        "db_container": "thoigianranh_db_main",
+        "db_name": "thoigianranh_db_main",
+        "db_pass": "thoigianranh_R00t_M4in_2026!"
+    },
+    "api.thoigianranh.com": {
+        "wp_container": "thoigianranh_wp_api",
+        "db_container": "thoigianranh_db_api",
+        "db_name": "thoigianranh_db_api",
+        "db_pass": "thoigianranh_R00t_Ap1_2026!"
+    }
+}

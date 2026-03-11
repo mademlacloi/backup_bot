@@ -1,0 +1,17 @@
+version: "3"
+services:
+  wireguard-client:
+    image: lscr.io/linuxserver/wireguard:latest
+    container_name: wireguard-client
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Asia/Ho_Chi_Minh
+    volumes:
+      - ./config:/config
+      - /lib/modules:/lib/modules
+    restart: always
+    network_mode: host
