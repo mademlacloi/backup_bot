@@ -101,8 +101,8 @@ manage_bot() {
     echo "0. Quay lại"
     read -p "Chọn: " bot_opt
     case $bot_opt in
-        1) systemctl restart ha_bot && echo -e "${GREEN}Đã restart Bot thành công!${NC}" ;;
-        2) journalctl -u ha_bot -f ;;
+        1) sudo systemctl restart ha_bot && echo -e "${GREEN}Đã restart Bot thành công!${NC}" ;;
+        2) sudo journalctl -u ha_bot -f ;;
     esac
     sleep 2
 }
