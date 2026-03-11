@@ -226,9 +226,10 @@ def handle_backup_file(message):
         with open(dest_path, 'wb') as new_file:
             new_file.write(downloaded_file)
         
-        # Phân tích dự án dựa trên tên file
-        # Tự động lấy tên dự án từ tên file (dựa trên cấu trúc domain_type.tar.gz)
-        project = file_name.split('_')[0] if '_' in file_name else "default"
+        # Lấy tên dự án từ tên file: vungvang.com_all_2026-03-11.tar.gz -> vungvang.com
+        # Tìm phần domain (trước dấu _)
+        parts = file_name.split('_')
+        project = parts[0] if parts else "default"
         
         markup = types.InlineKeyboardMarkup(row_width=2)
         btn_start = types.InlineKeyboardButton("🚀 Chạy Khôi Phục", callback_data=f"do_restore_{project}_{file_name}")
