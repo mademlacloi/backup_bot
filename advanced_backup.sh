@@ -59,25 +59,30 @@ case $TYPE in
         nice -n 19 ionice -c 3 cpulimit -l "$LIMIT" -- sh -c "docker exec $WP_CONT tar -czf - /var/www/html/wp-content/uploads > $TEMP_DIR/$FINAL_FILE"
         ;;
     "all")
-        # Backup DB trước (Thử cả mariadb-dump và mysqldump)
-        docker exec "$DB_CONT" mariadb-dump -u root -p"$DB_PASS" --all-databases > "$TEMP_DIR/dump.sql" 2>/dev/null || \
-        docker exec "$DB_CONT" mysqldump -u root -p"$DB_PASS" --all-databases > "$TEMP_DIR/dump.sql" 2>/dev/null
-        
+        # Bước 1: Dump Database (Ghi trực tiếp vào file)
+        echo " -> Đang dump database..."
+        docker exec "$DB_CONT" mariadb-dump -u root -p"$DB_PASS" "$DB_NAME" > "$TEMP_DIR/dump.sql" 2>/dev/null || \
+        docker exec "$DB_CONT" mysqldump -u root -p"$DB_PASS" "$DB_NAME" > "$TEMP_DIR/dump.sql" 2>/dev/null
+
         if [ ! -s "$TEMP_DIR/dump.sql" ]; then
-            echo "Lỗi: Không thể xuất dữ liệu database (quyền hạn hoặc sai lệnh dump)."
+            echo "Lỗi: Database dump thất bại. DB_CONT=$DB_CONT DB_NAME=$DB_NAME"
             rm -rf "$TEMP_DIR"
             exit 1
         fi
+        echo " -> Dump DB thành công ($(du -sh "$TEMP_DIR/dump.sql" | cut -f1))"
 
-        # Nén toàn bộ mã nguồn + file dump DB
-        nice -n 19 ionice -c 3 cpulimit -l "$LIMIT" -- sh -c "docker exec $WP_CONT tar -czf - /var/www/html > $TEMP_DIR/html.tar.gz" 2>/dev/null
-        
-        if [ ! -f "$TEMP_DIR/html.tar.gz" ]; then
-            echo "Lỗi: Không thể nén thư mục /var/www/html."
+        # Bước 2: Nén toàn bộ thư mục Web
+        echo " -> Đang nén mã nguồn Web..."
+        docker exec "$WP_CONT" tar -czf - /var/www/html > "$TEMP_DIR/html.tar.gz" 2>/dev/null
+
+        if [ ! -s "$TEMP_DIR/html.tar.gz" ]; then
+            echo "Lỗi: Không thể nén /var/www/html. WP_CONT=$WP_CONT"
             rm -rf "$TEMP_DIR"
             exit 1
         fi
+        echo " -> Nén Web thành công ($(du -sh "$TEMP_DIR/html.tar.gz" | cut -f1))"
 
+        # Bước 3: Gộp tất cả vào 1 file tar.gz
         (cd "$TEMP_DIR" && tar -czf "$FINAL_FILE" dump.sql html.tar.gz)
         rm "$TEMP_DIR/dump.sql" "$TEMP_DIR/html.tar.gz"
         ;;
