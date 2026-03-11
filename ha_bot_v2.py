@@ -4,6 +4,9 @@ import subprocess
 import os
 import json
 import sys
+import threading
+
+download_lock = threading.Lock()
 
 CONFIG_PATH = "/opt/bot_manager.json"
 
@@ -203,7 +206,7 @@ def manual_restore(message):
     bot.reply_to(message, help_text, parse_mode='Markdown')
 
 @bot.message_handler(content_types=['document'])
-def handle_backup_file(message):
+def handle_docs(message):
     if not is_admin(message): return
     file_name = message.document.file_name
     
@@ -212,48 +215,51 @@ def handle_backup_file(message):
         bot.reply_to(message, "❌ Định dạng tệp không hợp lệ. Vui lòng gửi tệp `.tar.gz` hoặc các phần `.part_xx` từ Kênh VPS.")
         return
 
-    msg = bot.reply_to(message, f"⏳ Đang tải tệp `{file_name}` về VPS... Vui lòng đợi.", parse_mode='Markdown')
+    msg = bot.reply_to(message, f"⏳ Đang chờ lượt để tải tệp `{file_name}`...", parse_mode='Markdown')
     
-    # Thư mục tạm để restore
-    restore_base = "/opt/restore_buffer"
-    os.makedirs(restore_base, exist_ok=True)
-    
-    try:
-        file_info = bot.get_file(message.document.file_id)
-        downloaded_file = bot.download_file(file_info.file_path)
+    with download_lock:
+        bot.edit_message_text(f"🚀 Đang tải tệp `{file_name}` về VPS...", message.chat.id, msg.message_id, parse_mode='Markdown')
         
-        dest_path = os.path.join(restore_base, file_name)
-        with open(dest_path, 'wb') as new_file:
-            new_file.write(downloaded_file)
+        # Thư mục tạm để restore
+        restore_base = "/opt/restore_buffer"
+        os.makedirs(restore_base, exist_ok=True)
         
-        # Lấy tên dự án từ tên file: vungvang.com_all_2026-03-11.tar.gz -> vungvang.com
-        # Tìm phần domain (trước dấu _)
-        parts = file_name.split('_')
-        project = parts[0] if parts else "default"
-        
-        markup = types.InlineKeyboardMarkup(row_width=2)
-        btn_start = types.InlineKeyboardButton("🚀 Chạy Khôi Phục", callback_data=f"do_restore_{project}_{file_name}")
-        btn_del = types.InlineKeyboardButton("🗑 Xóa file này", callback_data=f"del_file_{file_name}")
-        markup.add(btn_start, btn_del)
-        
-        bot.edit_message_text(f"✅ Đã nhận: `{file_name}`\nDự án dự kiến: **{project}**\n\nBạn muốn làm gì?", 
-                              message.chat.id, msg.message_id, reply_markup=markup, parse_mode='Markdown')
-    except Exception as e:
-        bot.edit_message_text(f"❌ Lỗi khi nhận file: {e}", message.chat.id, msg.message_id)
+        try:
+            file_info = bot.get_file(message.document.file_id)
+            downloaded_file = bot.download_file(file_info.file_path)
+            
+            dest_path = os.path.join(restore_base, file_name)
+            with open(dest_path, 'wb') as new_file:
+                new_file.write(downloaded_file)
+            
+            # Lấy tên dự án từ tên file: vungvang.com_all_2026-03-11.tar.gz -> vungvang.com
+            parts = file_name.split('_')
+            project = parts[0] if parts else "default"
+            
+            markup = types.InlineKeyboardMarkup(row_width=2)
+            # Rút gọn callback_data để tránh lỗi BUTTON_DATA_INVALID (max 64 bytes)
+            btn_start = types.InlineKeyboardButton("🚀 Chạy Khôi Phục", callback_data=f"dr_{project}")
+            btn_del = types.InlineKeyboardButton("🗑 Xóa file", callback_data=f"df_{file_name}")
+            markup.add(btn_start, btn_del)
+            
+            bot.edit_message_text(f"✅ Đã nhận: `{file_name}`\nDự án dự kiến: **{project}**\n\nBạn muốn làm gì?", 
+                                   message.chat.id, msg.message_id, reply_markup=markup, parse_mode='Markdown')
+        except Exception as e:
+            bot.edit_message_text(f"❌ Lỗi khi nhận file: {e}", message.chat.id, msg.message_id)
 
-@bot.callback_query_handler(func=lambda call: call.data.startswith("del_file_"))
+@bot.callback_query_handler(func=lambda call: call.data.startswith("df_"))
 def handle_delete_file(call):
-    filename = call.data.replace("del_file_", "")
+    filename = call.data.replace("df_", "")
     path = os.path.join("/opt/restore_buffer", filename)
     if os.path.exists(path):
         os.remove(path)
     bot.edit_message_text(f"🗑 Đã xóa tệp tạm `{filename}`.", call.message.chat.id, call.message.message_id)
 
-@bot.callback_query_handler(func=lambda call: call.data.startswith("do_restore_"))
+@bot.callback_query_handler(func=lambda call: call.data.startswith("dr_"))
 def handle_restore_execute(call):
     if not is_admin(call.message): return
-    data = call.data.split("_")
-    project = data[2]
+    # Lấy project từ callback: dr_project_name
+    project = call.data.split("_")[1]
     
     bot.edit_message_text(f"⏳ Đang khôi phục **{project}**... \n(Đã giới hạn CPU 90% để ưu tiên Web truy cập)", 
                           call.message.chat.id, call.message.message_id, parse_mode='Markdown')
